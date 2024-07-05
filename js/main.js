@@ -111,5 +111,5 @@ const createUniqueRandomPhotoInfo = () => {
   };
 };
 
-const mass = Array.from({length : count}, createUniqueRandomPhotoInfo());
+createUniqueRandomPhotoInfo();
 
