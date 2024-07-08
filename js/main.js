@@ -1,7 +1,5 @@
-const count = 25;
-const idPhotos = Array.from({length : count}, (_, i) => i + 1);
-const urlPhotos = Array.from({length : count}, (_, i) => `photos/${i + 1}.jpg)`);
-const descriptionPhotos = [
+const COUNT_PHOTO_OBJECT = 25;
+const DESCRIPTION_PHOTOS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisis.',
   'Fusce congue lacinia ligula nec sagittis. Curabitur ante nibh, sagittis.',
   'Donec sagittis nisl et felis ultrices lacinia. Maecenas condimentum condimentum.',
@@ -18,7 +16,7 @@ const descriptionPhotos = [
   'Vivamus dapibus pulvinar cursus. Donec fermentum placerat pulvinar. Mauris ac.',
   'Integer augue neque, tempor eget vehicula faucibus, viverra volutpat lorem.'
 ];
-const names = [
+const USER_NAMES = [
   'Alastair',
   'Fergus',
   'Crispin',
@@ -37,7 +35,7 @@ const names = [
   'Charlotte',
   'Benjamin'
 ];
-const messages = [
+const COMMENT_MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -45,7 +43,6 @@ const messages = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-const avatars = Array.from({length : 6}, (_, x) => `img/avatar-${x + 1}.svg`);
 
 const getRandomValue = (min, max) => {
   const lower = Math.ceil(Math.min(min, max));
@@ -55,61 +52,27 @@ const getRandomValue = (min, max) => {
   return Math.floor(result);
 };
 
-const getRandomArrayElement = (elements) => elements[getRandomValue(0, elements.length - 1)];
+const createPhotoComment = (id) => ({
+  return: {
+    id: id,
+    avatar: `img/avatar-${getRandomValue(0, 6)}.svg`,
+    message: COMMENT_MESSAGES[getRandomValue(0, COMMENT_MESSAGES.length - 1)],
+    name: USER_NAMES[getRandomValue(0, USER_NAMES.length - 1)],
+  }
+});
 
-const createUniqueRandomComment = () => {
-  const arrayOfComments = [];
+const createPhotoObject = (id) => ({
+  return: {
+    id : id,
+    url: `photos/${id}.jpg)`,
+    description: DESCRIPTION_PHOTOS[getRandomValue(0, DESCRIPTION_PHOTOS.length - 1)],
+    likes: getRandomValue(15, 200),
+    comment: createPhotoComment(id),
+  }
+});
 
-  return function () {
-    const comment = {
-      id: Math.ceil(Math.random() * 100),
-      avatar: getRandomArrayElement(avatars),
-      message: getRandomArrayElement(messages),
-      name: getRandomArrayElement(names),
-    };
-    const arrayIdFromArrayComments = arrayOfComments.map((obj) => obj.id);
+const createGallery = (arrayLength) => ({
+  return : Array.from({length : arrayLength}, (_, i) => createPhotoObject(i + 1))
+});
 
-    while (arrayIdFromArrayComments.includes(comment.id)) {
-      comment.id = Math.ceil(Math.random() * 100);
-    }
-
-    arrayOfComments.push(comment);
-
-    return comment;
-  };
-};
-
-const getMassRandomQuantityComments = (lengthMass) => Array.from({length: lengthMass}, createUniqueRandomComment());
-
-const createUniqueRandomPhotoInfo = () => {
-  const arrayPhotoDescriptions = [];
-
-  return function () {
-    let photoDescription = {
-      id: getRandomArrayElement(idPhotos),
-      url: getRandomArrayElement(urlPhotos),
-      description: getRandomArrayElement(descriptionPhotos),
-      likes: getRandomValue(15, 200),
-      comment: getMassRandomQuantityComments(Math.floor(Math.random() * 10)),
-    };
-    const arrayIdFromArrayPhotoDescriptions = arrayPhotoDescriptions.map((obj) => obj.id);
-    const arrayUrlFromArrayPhotoDescriptions = arrayPhotoDescriptions.map((obj) => obj.url);
-
-    while (arrayIdFromArrayPhotoDescriptions.includes(photoDescription.id) || arrayUrlFromArrayPhotoDescriptions.includes(photoDescription.url)) {
-      photoDescription = {
-        id: getRandomArrayElement(idPhotos),
-        url: getRandomArrayElement(urlPhotos),
-        description: getRandomArrayElement(descriptionPhotos),
-        likes: getRandomValue(15, 200),
-        comment: getMassRandomQuantityComments(Math.floor(Math.random() * 10)),
-      };
-    }
-
-    arrayPhotoDescriptions.push(photoDescription);
-
-    return photoDescription;
-  };
-};
-
-createUniqueRandomPhotoInfo();
-
+createGallery(COUNT_PHOTO_OBJECT);
