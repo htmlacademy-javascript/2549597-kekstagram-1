@@ -1,5 +1,11 @@
-const COUNT_PHOTO_OBJECT = 25;
-const DESCRIPTION_PHOTOS = [
+const MAX_PHOTO_LENGTH = 25;
+const MAX_LIKES = 200;
+const MIN_LIKES = 15;
+const MIN_QUANTITY_COMMENTS = 1;
+const MAX_QUANTITY_COMMENTS = 7;
+const MIN_AVATAR_ID = 0;
+const MAX_AVATAR_ID = 6;
+const PHOTO_DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisis.',
   'Fusce congue lacinia ligula nec sagittis. Curabitur ante nibh, sagittis.',
   'Donec sagittis nisl et felis ultrices lacinia. Maecenas condimentum condimentum.',
@@ -16,7 +22,7 @@ const DESCRIPTION_PHOTOS = [
   'Vivamus dapibus pulvinar cursus. Donec fermentum placerat pulvinar. Mauris ac.',
   'Integer augue neque, tempor eget vehicula faucibus, viverra volutpat lorem.'
 ];
-const USER_NAMES = [
+const USERNAMES = [
   'Alastair',
   'Fergus',
   'Crispin',
@@ -35,7 +41,7 @@ const USER_NAMES = [
   'Charlotte',
   'Benjamin'
 ];
-const COMMENT_MESSAGES = [
+const COMMENTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -52,27 +58,27 @@ const getRandomValue = (min, max) => {
   return Math.floor(result);
 };
 
+const getRandomArrayElement = (elements) => elements[getRandomValue(0, elements.length - 1)];
+
 const createPhotoComment = (id) => ({
   return: {
     id: id,
-    avatar: `img/avatar-${getRandomValue(0, 6)}.svg`,
-    message: COMMENT_MESSAGES[getRandomValue(0, COMMENT_MESSAGES.length - 1)],
-    name: USER_NAMES[getRandomValue(0, USER_NAMES.length - 1)],
+    avatar: `img/avatar-${getRandomValue(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
+    message: getRandomArrayElement(COMMENTS),
+    name: getRandomArrayElement(USERNAMES),
   }
 });
 
-const createPhotoObject = (id) => ({
+const createPhoto = (id) => ({
   return: {
     id : id,
     url: `photos/${id}.jpg)`,
-    description: DESCRIPTION_PHOTOS[getRandomValue(0, DESCRIPTION_PHOTOS.length - 1)],
-    likes: getRandomValue(15, 200),
-    comment: createPhotoComment(id),
+    description: getRandomArrayElement(PHOTO_DESCRIPTIONS),
+    likes: getRandomValue(MIN_LIKES, MAX_LIKES),
+    comment: Array.from({length: getRandomValue(MIN_QUANTITY_COMMENTS, MAX_QUANTITY_COMMENTS)}, (_, i) => createPhotoComment(i + 1)),
   }
 });
 
-const createGallery = (arrayLength) => ({
-  return : Array.from({length : arrayLength}, (_, i) => createPhotoObject(i + 1))
-});
+const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
 
-createGallery(COUNT_PHOTO_OBJECT);
+createGallery(MAX_PHOTO_LENGTH);
