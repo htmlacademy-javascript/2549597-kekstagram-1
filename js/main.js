@@ -61,22 +61,18 @@ const getRandomValue = (min, max) => {
 const getRandomArrayElement = (elements) => elements[getRandomValue(0, elements.length - 1)];
 
 const createPhotoComment = (id) => ({
-  return: {
-    id: id,
-    avatar: `img/avatar-${getRandomValue(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
-    message: getRandomArrayElement(COMMENTS),
-    name: getRandomArrayElement(USERNAMES),
-  }
+  id,
+  avatar: `img/avatar-${getRandomValue(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
+  message: getRandomArrayElement(COMMENTS),
+  name: getRandomArrayElement(USERNAMES),
 });
 
 const createPhoto = (id) => ({
-  return: {
-    id : id,
-    url: `photos/${id}.jpg)`,
-    description: getRandomArrayElement(PHOTO_DESCRIPTIONS),
-    likes: getRandomValue(MIN_LIKES, MAX_LIKES),
-    comment: Array.from({length: getRandomValue(MIN_QUANTITY_COMMENTS, MAX_QUANTITY_COMMENTS)}, (_, i) => createPhotoComment(i + 1)),
-  }
+  id,
+  url: `photos/${id}.jpg`,
+  description: getRandomArrayElement(PHOTO_DESCRIPTIONS),
+  likes: getRandomValue(MIN_LIKES, MAX_LIKES),
+  comment: Array.from({length: getRandomValue(MIN_QUANTITY_COMMENTS, MAX_QUANTITY_COMMENTS)}, (_, i) => createPhotoComment(i + 1)),
 });
 
 const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
