@@ -1,4 +1,4 @@
-import {getRandomValue, getRandomArrayElement} from './js/main.js';
+import {getRandomValue, getRandomArrayElement} from './js/utils.js';
 
 const MAX_PHOTO_LENGTH = 25;
 const MAX_LIKES = 200;
