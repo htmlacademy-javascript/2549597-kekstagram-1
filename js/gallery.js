@@ -1,6 +1,9 @@
 import * as CONSTANTS from './data.js';
 import {getRandomValue, getRandomArrayElement} from './utils.js';
 
+const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
+const pictures = document.querySelector('.pictures');
+
 const createPhotoComment = (id) => ({
   id,
   avatar: `img/avatar-${getRandomValue(CONSTANTS.MIN_AVATAR_ID, CONSTANTS.MAX_AVATAR_ID)}.svg`,
@@ -19,7 +22,7 @@ const createPhoto = (id) => ({
 const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
 
 const createPhotoElement = (element) => {
-  const patternClon = CONSTANTS.imageTemplate.cloneNode(true);
+  const patternClon = imageTemplate.cloneNode(true);
 
   patternClon.querySelector('.picture__img').src = element.url;
   patternClon.querySelector('.picture__likes').textContent = element.likes;
@@ -28,11 +31,14 @@ const createPhotoElement = (element) => {
   return patternClon;
 };
 
-const renderGallery = () => {
-  createGallery(CONSTANTS.MAX_PHOTO_LENGTH).forEach((element) => {
-    CONSTANTS.fragment.appendChild(createPhotoElement(element));
+const renderGallery = (arrayPhoto) => {
+  const fragment = document.createDocumentFragment();
+
+  arrayPhoto.forEach((element) => {
+    fragment.append(createPhotoElement(element));
   });
-  CONSTANTS.pictures.appendChild(CONSTANTS.fragment);
+
+  pictures.append(fragment);
 };
 
-renderGallery();
+renderGallery(createGallery(CONSTANTS.MAX_PHOTO_LENGTH));

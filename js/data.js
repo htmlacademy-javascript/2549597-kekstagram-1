@@ -49,8 +49,3 @@ export const COMMENTS = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-
-export const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
-export const fragment = document.createDocumentFragment();
-export const pictures = document.querySelector('.pictures');
-
