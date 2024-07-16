@@ -1,2 +1,2 @@
-import './display-gallery.js';
+import './gallery.js';
 import './functions.js';
