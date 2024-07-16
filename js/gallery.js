@@ -1,6 +1,6 @@
-import {getRandomValue, getRandomArrayElement} from './js/utils.js';
+import {getRandomValue, getRandomArrayElement} from './utils.js';
 
-const MAX_PHOTO_LENGTH = 25;
+export const MAX_PHOTO_LENGTH = 25;
 const MAX_LIKES = 200;
 const MIN_LIKES = 15;
 const MIN_QUANTITY_COMMENTS = 1;
@@ -69,4 +69,4 @@ const createPhoto = (id) => ({
 
 const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
 
-createGallery(MAX_PHOTO_LENGTH);
+export{createGallery};
