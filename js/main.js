@@ -1,2 +1,2 @@
-import './js/gallery.js';
-import './js/functions.js';
+import './gallery.js';
+import './functions.js';
