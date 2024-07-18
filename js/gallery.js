@@ -22,23 +22,24 @@ const createPhoto = (id) => ({
 const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
 
 const createPhotoElement = (element) => {
-  const patternClon = imageTemplate.cloneNode(true);
+  const image = imageTemplate.cloneNode(true);
 
-  patternClon.querySelector('.picture__img').src = element.url;
-  patternClon.querySelector('.picture__likes').textContent = element.likes;
-  patternClon.querySelector('.picture__comments').textContent = element.comment.length;
+  image.querySelector('.picture__img').src = element.url;
+  image.querySelector('.picture__likes').textContent = element.likes;
+  image.querySelector('.picture__comments').textContent = element.comment.length;
 
-  return patternClon;
+  return image;
 };
 
-const renderGallery = (arrayPhoto) => {
+const renderGallery = (data) => {
   const fragment = document.createDocumentFragment();
 
-  arrayPhoto.forEach((element) => {
+  data.forEach((element) => {
     fragment.append(createPhotoElement(element));
   });
 
   pictures.append(fragment);
 };
+export const dataGallery = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 
-renderGallery(createGallery(CONSTANTS.MAX_PHOTO_LENGTH));
+renderGallery(dataGallery);
