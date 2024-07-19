@@ -1,5 +1,6 @@
 import * as CONSTANTS from './data.js';
 import {getRandomValue, getRandomArrayElement} from './utils.js';
+import {renderBigPhoto} from './big-picture.js';
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
@@ -27,7 +28,7 @@ const createPhotoElement = (element) => {
   image.querySelector('.picture__img').src = element.url;
   image.querySelector('.picture__likes').textContent = element.likes;
   image.querySelector('.picture__comments').textContent = element.comment.length;
-
+  image.querySelector('.picture__img').setAttribute('data', element.id - 1);
   return image;
 };
 
@@ -40,6 +41,12 @@ const renderGallery = (data) => {
 
   pictures.append(fragment);
 };
-export const dataGallery = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
+const galleryData = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 
-renderGallery(dataGallery);
+renderGallery(galleryData);
+
+pictures.addEventListener('click', (evt) => {
+  if (evt.target.nodeName === 'IMG') {
+    renderBigPhoto(galleryData[evt.target.attributes.data.value]);
+  }
+});

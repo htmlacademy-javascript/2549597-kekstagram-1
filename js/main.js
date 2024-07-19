@@ -1,3 +1,3 @@
 import './gallery.js';
 import './functions.js';
-import './full-size-photo.js';
+import './big-picture.js';
