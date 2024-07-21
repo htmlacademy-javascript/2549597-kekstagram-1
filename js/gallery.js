@@ -22,13 +22,14 @@ const createPhoto = (id) => ({
 
 const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
 
-const createPhotoElement = (element) => {
+const createPhotoElement = (data) => {
   const image = imageTemplate.cloneNode(true);
 
-  image.querySelector('.picture__img').src = element.url;
-  image.querySelector('.picture__likes').textContent = element.likes;
-  image.querySelector('.picture__comments').textContent = element.comment.length;
-  image.querySelector('.picture__img').setAttribute('data', element.id - 1);
+  image.querySelector('.picture__img').src = data.url;
+  image.querySelector('.picture__likes').textContent = data.likes;
+  image.querySelector('.picture__comments').textContent = data.comment.length;
+  image.querySelector('.picture__img').setAttribute('data-id', data.id);
+
   return image;
 };
 
@@ -46,7 +47,8 @@ const galleryData = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 renderGallery(galleryData);
 
 pictures.addEventListener('click', (evt) => {
-  if (evt.target.nodeName === 'IMG') {
-    renderBigPhoto(galleryData[evt.target.attributes.data.value]);
+  if (!(evt.target.closest('.picture').className === 'picture' && evt.target.dataset.id)) {
+    return;
   }
+  renderBigPhoto(galleryData.find((item) => item.id === Number(evt.target.dataset.id)));
 });
