@@ -1,6 +1,7 @@
 import * as CONSTANTS from './data.js';
 import {getRandomValue, getRandomArrayElement} from './utils.js';
 import {renderBigPhoto} from './big-picture.js';
+import { renderComments } from './big-picture.js';
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
@@ -47,9 +48,15 @@ const galleryData = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 renderGallery(galleryData);
 
 pictures.addEventListener('click', (evt) => {
-  if (!(evt.target.closest('.picture').className && evt.target.dataset.id)) {
+  const desiredElement = galleryData.find((item) => item.id === Number(evt.target.dataset.id));
+
+  if (!(evt.target.closest('.picture__img').dataset.id)) {
     return;
   }
 
-  renderBigPhoto(galleryData.find((item) => item.id === Number(evt.target.dataset.id)) || []);
+  if (desiredElement) {
+    renderBigPhoto(desiredElement);
+
+    renderComments(desiredElement.comment);
+  }
 });
