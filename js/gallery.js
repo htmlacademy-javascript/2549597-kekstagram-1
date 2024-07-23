@@ -1,5 +1,6 @@
 import * as CONSTANTS from './data.js';
 import {getRandomValue, getRandomArrayElement} from './utils.js';
+import {renderBigPhoto} from './big-picture.js';
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
@@ -21,24 +22,40 @@ const createPhoto = (id) => ({
 
 const createGallery = (length) => Array.from({length}, (_, i) => createPhoto(i + 1));
 
-const createPhotoElement = (element) => {
-  const patternClon = imageTemplate.cloneNode(true);
+const createPhotoElement = (data) => {
+  const image = imageTemplate.cloneNode(true);
 
-  patternClon.querySelector('.picture__img').src = element.url;
-  patternClon.querySelector('.picture__likes').textContent = element.likes;
-  patternClon.querySelector('.picture__comments').textContent = element.comment.length;
+  image.querySelector('.picture__img').src = data.url;
+  image.querySelector('.picture__likes').textContent = data.likes;
+  image.querySelector('.picture__comments').textContent = data.comment.length;
+  image.querySelector('.picture__img').setAttribute('data-id', data.id);
 
-  return patternClon;
+  return image;
 };
 
-const renderGallery = (arrayPhoto) => {
+const renderGallery = (data) => {
   const fragment = document.createDocumentFragment();
 
-  arrayPhoto.forEach((element) => {
+  data.forEach((element) => {
     fragment.append(createPhotoElement(element));
   });
 
   pictures.append(fragment);
 };
+const galleryData = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 
-renderGallery(createGallery(CONSTANTS.MAX_PHOTO_LENGTH));
+renderGallery(galleryData);
+
+pictures.addEventListener('click', (evt) => {
+  const closestEl = evt.target.closest('.picture__img[data-id]');
+
+  if (!closestEl) {
+    return;
+  }
+
+  const photoData = galleryData.find((item) => item.id === Number(closestEl.dataset.id));
+
+  if (photoData) {
+    renderBigPhoto(photoData);
+  }
+});

@@ -9,4 +9,5 @@ export const getRandomValue = (min, max) => {
 
 export const getRandomArrayElement = (elements) => elements[getRandomValue(0, elements.length - 1)];
 
+export const isEscKey = (evt) => evt.key === 'Escape';
 

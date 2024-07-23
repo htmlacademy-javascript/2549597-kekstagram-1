@@ -3,7 +3,7 @@ export const MAX_LIKES = 200;
 export const MIN_LIKES = 15;
 export const MIN_QUANTITY_COMMENTS = 1;
 export const MAX_QUANTITY_COMMENTS = 7;
-export const MIN_AVATAR_ID = 0;
+export const MIN_AVATAR_ID = 1;
 export const MAX_AVATAR_ID = 6;
 export const PHOTO_DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisis.',
