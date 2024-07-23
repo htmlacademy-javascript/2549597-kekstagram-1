@@ -15,21 +15,27 @@ const renderPhotoInfo = (photo) => {
 
 };
 
+const createComment = (comment) => {
+  const listItem = commentTemplate.cloneNode(true);
+  const picture = listItem.querySelector('.social__picture');
+
+  picture.src = comment.avatar;
+  picture.alt = comment.name;
+  listItem.querySelector('.social__text').textContent = comment.message;
+
+  return listItem;
+};
+
 const createComments = (comments) => {
   const fragment = document.createDocumentFragment();
 
   comments.forEach((comment) => {
-    const listItem = commentTemplate.cloneNode(true);
-
-    listItem.querySelector('.social__picture').src = comment.avatar;
-    listItem.querySelector('.social__picture').alt = comment.name;
-    listItem.querySelector('.social__text').textContent = comment.message;
-
-    fragment.append(listItem);
+    fragment.append(createComment(comment));
   });
 
   return fragment;
 };
+
 
 const closeBigPicture = () => {
   bigPicture.classList.add('hidden');
@@ -51,10 +57,12 @@ closeBtn.addEventListener('click', () => {
 });
 
 export const renderBigPhoto = (photo) => {
+  const comments = createComments(photo.comment);
+
   bigPicture.classList.remove('hidden');
   document.addEventListener('keydown', onDocumentKeydown);
 
   renderPhotoInfo(photo);
-  bigPicture.querySelector('.social__comments').append(createComments(photo.comment));
+  bigPicture.querySelector('.social__comments').append(comments);
   document.body.classList.add('modal-open');
 };

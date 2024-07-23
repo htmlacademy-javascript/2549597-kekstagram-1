@@ -47,8 +47,9 @@ const galleryData = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 renderGallery(galleryData);
 
 pictures.addEventListener('click', (evt) => {
-  if (!(evt.target.closest('.picture').className === 'picture' && evt.target.dataset.id)) {
+  if (!(evt.target.closest('.picture').className && evt.target.dataset.id)) {
     return;
   }
-  renderBigPhoto(galleryData.find((item) => item.id === Number(evt.target.dataset.id)));
+
+  renderBigPhoto(galleryData.find((item) => item.id === Number(evt.target.dataset.id)) || []);
 });
