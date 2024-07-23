@@ -1,9 +1,0 @@
-export const bigPicture = document.querySelector('.big-picture');
-export const closeBtn = bigPicture.querySelector('.big-picture__cancel');
-export const photoComments = bigPicture.querySelector('.social__comments');
-export const commentCount = bigPicture.querySelector('.social__comment-count');
-export const commentLoader = bigPicture.querySelector('.comments-loader');
-export const bigPicImg = bigPicture.querySelector('.big-picture__img img');
-export const likesCount = bigPicture.querySelector('.likes-count');
-export const commentsCount = bigPicture.querySelector('.comments-count');
-export const bigPicCaption = bigPicture.querySelector('.social__caption');
