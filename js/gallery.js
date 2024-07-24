@@ -42,6 +42,7 @@ const renderGallery = (data) => {
 
   pictures.append(fragment);
 };
+
 const galleryData = createGallery(CONSTANTS.MAX_PHOTO_LENGTH);
 
 renderGallery(galleryData);
