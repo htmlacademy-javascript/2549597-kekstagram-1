@@ -1,6 +1,6 @@
 import * as CONSTANTS from './data.js';
 import {getRandomValue, getRandomArrayElement} from './utils.js';
-import {renderBigPhoto} from './big-picture.js';
+import {showBigPhoto} from './big-picture.js';
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
@@ -57,6 +57,6 @@ pictures.addEventListener('click', (evt) => {
   const photoData = galleryData.find((item) => item.id === Number(closestEl.dataset.id));
 
   if (photoData) {
-    renderBigPhoto(photoData);
+    showBigPhoto(photoData);
   }
 });

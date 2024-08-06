@@ -1,6 +1,6 @@
 import {isEscKey} from './utils.js';
 
-const countShownComments = 5;
+const COUNT_SHOWN_COMMENTS = 5;
 const commentTemplate = document.querySelector('#comments').content.querySelector('.social__comment');
 const bigPicture = document.querySelector('.big-picture');
 const closeBtn = bigPicture.querySelector('.big-picture__cancel');
@@ -11,15 +11,14 @@ const bigPictureCaption = bigPicture.querySelector('.social__caption');
 const showCommentsBtn = document.querySelector('.social__comments-loader');
 const visibleCommentCount = document.querySelector('.visible-comments-count');
 const commentCount = document.querySelector('.comments-count');
+let commentArray;
+let counterComments;
 
 const renderPhotoInfo = (photo) => {
   bigPictureImg.src = photo.url;
   likesCount.textContent = photo.likes;
   bigPictureCaption.textContent = photo.description;
-
-  const comment = photo.comment.length < countShownComments ? photo.comment.length : countShownComments;
   commentCount.textContent = `${photo.comment.length}`;
-  visibleCommentCount.textContent = `${comment}`;
 };
 
 const createComment = (comment) => {
@@ -34,22 +33,28 @@ const createComment = (comment) => {
   return commentEl;
 };
 
-const renderComments = (comments, counter) => {
+const renderComments = () => {
   const fragment = document.createDocumentFragment();
-  const visibleComments = comments.slice(0, counter);
+  const visibleComments = commentArray.slice(0, counterComments);
 
   visibleComments.forEach((comment) => {
     fragment.append(createComment(comment));
   });
 
-  photoComments.innerHTML = '';
-  photoComments.append(fragment);
+  photoComments.replaceChildren(fragment);
 
   visibleCommentCount.textContent = `${visibleComments.length}`;
 };
 
+const showComments = () => {
+  counterComments += COUNT_SHOWN_COMMENTS;
+  renderComments();
+};
 
 const closeBigPicture = () => {
+  commentCount.textContent = '';
+  visibleCommentCount.textContent = '';
+
   bigPicture.classList.add('hidden');
   photoComments.innerHTML = '';
   document.body.classList.remove('modal-open');
@@ -68,17 +73,19 @@ closeBtn.addEventListener('click', () => {
   closeBigPicture();
 });
 
-export const renderBigPhoto = (photo) => {
-  let counterComments = countShownComments;
+export const showBigPhoto = (photo) => {
+  commentArray = photo.comment;
+  counterComments = COUNT_SHOWN_COMMENTS;
+
+  if (commentArray < COUNT_SHOWN_COMMENTS) {
+    counterComments = commentArray;
+  }
+
   bigPicture.classList.remove('hidden');
   document.addEventListener('keydown', onDocumentKeydown);
   renderPhotoInfo(photo);
   document.body.classList.add('modal-open');
-  renderComments(photo.comment, countShownComments);
-
-  showCommentsBtn.addEventListener('click', () => {
-    counterComments += countShownComments;
-    renderComments(photo.comment, counterComments);
-  });
+  renderComments();
 };
 
+showCommentsBtn.addEventListener('click', showComments);
