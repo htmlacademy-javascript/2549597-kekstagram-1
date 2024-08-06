@@ -5,7 +5,6 @@ export const MIN_QUANTITY_COMMENTS = 1;
 export const MAX_QUANTITY_COMMENTS = 20;
 export const MIN_AVATAR_ID = 1;
 export const MAX_AVATAR_ID = 6;
-export const COUNT_SHOWN_COMMENTS = 5;
 export const PHOTO_DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisis.',
   'Fusce congue lacinia ligula nec sagittis. Curabitur ante nibh, sagittis.',
