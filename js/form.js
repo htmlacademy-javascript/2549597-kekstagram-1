@@ -1,23 +1,19 @@
 import {isEscKey} from './utils.js';
 
+const MAX_TEXT_LENGTH = 140;
+const MAX_QUANTITY_HASHTAGS = 5;
+const TAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
+const HASHTAG_ERROR_TEXT = 'Не верный хештэг';
+const TEXTAREA_ERROR_TEXT = `Длина комментария не больше ${MAX_TEXT_LENGTH} символов`;
+
 const onUploadFileChange = document.querySelector('.img-upload__input');
 const imgUploadOverlay = document.querySelector('.img-upload__overlay');
 const onImgUploadCancelClick = document.querySelector('.img-upload__cancel');
-const imgUploadPreview = document.querySelector('.img-upload__preview img');
 const onFormSubmit = document.querySelector('.img-upload__form');
 const userHashtags = document.querySelector('.text__hashtags');
-const userTextDescription = document.querySelector('.text__description');
+const description = document.querySelector('.text__description');
 
-let hashtags = [];
-const MAX_TEXT_LENGTH = 140;
-const MAX_QUANTITY_HASHTAGS = 5;
-const MAX_LENGTH_HASHTAGS = 19;
-const MIN_LENGTH_HASHTAGS = 2;
-
-const hashtag = new RegExp('^#[a-zа-яё0-9]{1,19}$','i');
-
-const closeImgUpload = () => {
-  hashtags = [];
+const closeForm = () => {
   onUploadFileChange.value = '';
 
   document.body.classList.remove('modal-open');
@@ -27,22 +23,25 @@ const closeImgUpload = () => {
 };
 
 function onDocumentKeydown(evt) {
+  if (document.activeElement === userHashtags || document.activeElement === description){
+    return;
+  }
+
   if (isEscKey(evt)) {
     evt.preventDefault();
-    closeImgUpload();
+    closeForm();
   }
 }
 
 onUploadFileChange.addEventListener('change', () => {
   imgUploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
-  document.addEventListener('keydown', onDocumentKeydown);
 
-  imgUploadPreview.src = onUploadFileChange.files[0].name;
+  document.addEventListener('keydown', onDocumentKeydown);
 });
 
 onImgUploadCancelClick.addEventListener('click', () => {
-  closeImgUpload();
+  closeForm();
 });
 
 const pristine = new Pristine(onFormSubmit, {
@@ -52,12 +51,13 @@ const pristine = new Pristine(onFormSubmit, {
   errorTextClass: 'form__error',
 });
 
-const validateHashtags = () => {
-  let validateHashtag = true;
-  hashtags = userHashtags.value.split(' ');
+const validateQuantityHashtags = (arrayHashtags) => arrayHashtags.length < MAX_QUANTITY_HASHTAGS;
 
-  for (let i = 0; i < hashtags.length; i++){
-    if(!hashtag.test(hashtags[i])){
+const validatePatternMatching = (arrayHashtags) => {
+  let validateHashtag = true;
+
+  for (let i = 0; i < arrayHashtags.length; i++){
+    if(!TAG_PATTERN.test(arrayHashtags[i])){
       validateHashtag = false;
       break;
     }
@@ -65,43 +65,39 @@ const validateHashtags = () => {
   return validateHashtag;
 };
 
-const errorTextValidateHahtags = () => {
-  if (hashtags.length > MAX_QUANTITY_HASHTAGS) {
-    return `Количество хэштегов не больше ${MAX_QUANTITY_HASHTAGS}`;
+const validateUniquenessHashtags = (arrayHashtags) => {
+  let valideateHashtag = true;
+
+  for (let i = 0; i < arrayHashtags.length; i++) {
+    if (arrayHashtags.indexOf(arrayHashtags[i]) !== arrayHashtags.lastIndexOf(arrayHashtags[i])) {
+      valideateHashtag = false;
+      break;
+    }
   }
 
-  if(!(hashtags.find((element) => element.length > MAX_LENGTH_HASHTAGS) === undefined)){
-    return `Длина одного хештега не больше ${MAX_LENGTH_HASHTAGS} символов`;
-  }
-
-  if(!(hashtags.find((element) => element.length < MIN_LENGTH_HASHTAGS) === undefined)){
-    return `Длина одного хештега не меньше ${MIN_LENGTH_HASHTAGS} символов`;
-  }
+  return valideateHashtag;
 };
 
-const errorTextValidateTextarea = () => `Длина комментария не больше ${MAX_TEXT_LENGTH} символов`;
+const validateHashtags = () => {
+  const hashtags = userHashtags.value.split(' ');
 
-const validateTextDescription = () => userTextDescription.value.length < MAX_TEXT_LENGTH;
+  if (!(validateQuantityHashtags(hashtags) && validatePatternMatching(hashtags) && validateUniquenessHashtags(hashtags))) {
+    return false;
+  }
 
-pristine.addValidator(userHashtags, validateHashtags, errorTextValidateHahtags);
+  return true;
+};
 
-pristine.addValidator(userTextDescription, validateTextDescription, errorTextValidateTextarea);
+const validateDescription = () => description.value.length < MAX_TEXT_LENGTH;
+
+pristine.addValidator(userHashtags, validateHashtags, HASHTAG_ERROR_TEXT);
+
+pristine.addValidator(description, validateDescription, TEXTAREA_ERROR_TEXT);
 
 onFormSubmit.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
 
   if (!isValid) {
     evt.preventDefault();
-  }
-});
-
-userHashtags.addEventListener('keydown', (evt) => {
-  if (isEscKey(evt)) {
-    evt.stopPropagation();
-  }
-});
-userTextDescription.addEventListener('keydown', (evt) => {
-  if (isEscKey(evt)) {
-    evt.stopPropagation();
   }
 });
