@@ -14,7 +14,7 @@ const userHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
 
 const closeForm = () => {
-  onUploadFileChange.value = '';
+  onFormSubmit.reset();
 
   document.body.classList.remove('modal-open');
   imgUploadOverlay.classList.add('hidden');
@@ -22,16 +22,10 @@ const closeForm = () => {
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
-const isTextFieldFocused = () => {
-  if (document.activeElement === userHashtags || document.activeElement === description) {
-    return true;
-  }
-
-  return false;
-};
+const isTextFieldFocused = () => document.activeElement === userHashtags || document.activeElement === description;
 
 function onDocumentKeydown(evt) {
-  if (isTextFieldFocused) {
+  if (isTextFieldFocused()) {
     return;
   }
 
@@ -59,9 +53,9 @@ const pristine = new Pristine(onFormSubmit, {
   errorTextClass: 'form__error',
 });
 
-const isValidateQuantityHashtags = (hashtags) => hashtags.length < MAX_HASHTAGS_QUANTITY;
+const isQuantityHashtagsValid = (hashtags) => hashtags.length < MAX_HASHTAGS_QUANTITY;
 
-const isValidatePatternMatching = (hashtags) => {
+const isPatternMatchingValid = (hashtags) => {
   for (const hashtag of hashtags) {
     if (!TAG_PATTERN.test(hashtag)) {
       return false;
@@ -71,30 +65,26 @@ const isValidatePatternMatching = (hashtags) => {
   return true;
 };
 
-const isValidateUniquenessHashtags = (hashtags) => {
-  const uniqueHashtags = new Set;
+const isUniquenessHashtagsValid = (hashtags) => {
+  const uniqueHashtags = new Set(hashtags);
 
-  for (const hashtag of hashtags) {
-    if (uniqueHashtags.has(hashtag)) {
-      return false;
-    }
-
-    uniqueHashtags.add(hashtag);
+  if (!(hashtags.length === uniqueHashtags.size)) {
+    return false;
   }
 
   return true;
 };
 
-const isValidateHashtags = () => {
+const isHashtagsValid = () => {
   const hashtags = userHashtags.value.toLowerCase().split(' ');
 
-  return isValidateQuantityHashtags(hashtags) && isValidatePatternMatching(hashtags) && isValidateUniquenessHashtags(hashtags);
+  return isQuantityHashtagsValid(hashtags) && isPatternMatchingValid(hashtags) && isUniquenessHashtagsValid(hashtags);
 };
 
-const isValidateDescription = () => description.value.length < MAX_TEXT_LENGTH;
+const isDescriptionValid = () => description.value.length < MAX_TEXT_LENGTH;
 
-pristine.addValidator(userHashtags, isValidateHashtags, HASHTAG_ERROR_TEXT);
-pristine.addValidator(description, isValidateDescription, TEXTAREA_ERROR_TEXT);
+pristine.addValidator(userHashtags, isHashtagsValid, HASHTAG_ERROR_TEXT);
+pristine.addValidator(description, isDescriptionValid, TEXTAREA_ERROR_TEXT);
 
 onFormSubmit.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
