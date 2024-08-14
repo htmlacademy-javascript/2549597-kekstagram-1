@@ -1,7 +1,7 @@
 import {isEscKey} from './utils.js';
 
 const MAX_TEXT_LENGTH = 140;
-const MAX_QUANTITY_HASHTAGS = 5;
+const MAX_HASHTAGS_QUANTITY = 5;
 const TAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
 const HASHTAG_ERROR_TEXT = 'Не верный хештэг';
 const TEXTAREA_ERROR_TEXT = `Длина комментария не больше ${MAX_TEXT_LENGTH} символов`;
@@ -22,8 +22,16 @@ const closeForm = () => {
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
+const isTextFieldFocused = () => {
+  if (document.activeElement === userHashtags || document.activeElement === description) {
+    return true;
+  }
+
+  return false;
+};
+
 function onDocumentKeydown(evt) {
-  if (document.activeElement === userHashtags || document.activeElement === description){
+  if (isTextFieldFocused) {
     return;
   }
 
@@ -51,48 +59,42 @@ const pristine = new Pristine(onFormSubmit, {
   errorTextClass: 'form__error',
 });
 
-const validateQuantityHashtags = (arrayHashtags) => arrayHashtags.length < MAX_QUANTITY_HASHTAGS;
+const isValidateQuantityHashtags = (hashtags) => hashtags.length < MAX_HASHTAGS_QUANTITY;
 
-const validatePatternMatching = (arrayHashtags) => {
-  let validateHashtag = true;
-
-  for (let i = 0; i < arrayHashtags.length; i++){
-    if(!TAG_PATTERN.test(arrayHashtags[i])){
-      validateHashtag = false;
-      break;
+const isValidatePatternMatching = (hashtags) => {
+  for (const hashtag of hashtags) {
+    if (!TAG_PATTERN.test(hashtag)) {
+      return false;
     }
-  }
-  return validateHashtag;
-};
-
-const validateUniquenessHashtags = (arrayHashtags) => {
-  let valideateHashtag = true;
-
-  for (let i = 0; i < arrayHashtags.length; i++) {
-    if (arrayHashtags.indexOf(arrayHashtags[i]) !== arrayHashtags.lastIndexOf(arrayHashtags[i])) {
-      valideateHashtag = false;
-      break;
-    }
-  }
-
-  return valideateHashtag;
-};
-
-const validateHashtags = () => {
-  const hashtags = userHashtags.value.split(' ');
-
-  if (!(validateQuantityHashtags(hashtags) && validatePatternMatching(hashtags) && validateUniquenessHashtags(hashtags))) {
-    return false;
   }
 
   return true;
 };
 
-const validateDescription = () => description.value.length < MAX_TEXT_LENGTH;
+const isValidateUniquenessHashtags = (hashtags) => {
+  const uniqueHashtags = new Set;
 
-pristine.addValidator(userHashtags, validateHashtags, HASHTAG_ERROR_TEXT);
+  for (const hashtag of hashtags) {
+    if (uniqueHashtags.has(hashtag)) {
+      return false;
+    }
 
-pristine.addValidator(description, validateDescription, TEXTAREA_ERROR_TEXT);
+    uniqueHashtags.add(hashtag);
+  }
+
+  return true;
+};
+
+const isValidateHashtags = () => {
+  const hashtags = userHashtags.value.toLowerCase().split(' ');
+
+  return isValidateQuantityHashtags(hashtags) && isValidatePatternMatching(hashtags) && isValidateUniquenessHashtags(hashtags);
+};
+
+const isValidateDescription = () => description.value.length < MAX_TEXT_LENGTH;
+
+pristine.addValidator(userHashtags, isValidateHashtags, HASHTAG_ERROR_TEXT);
+pristine.addValidator(description, isValidateDescription, TEXTAREA_ERROR_TEXT);
 
 onFormSubmit.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
