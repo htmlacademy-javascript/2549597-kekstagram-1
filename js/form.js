@@ -1,4 +1,5 @@
 import {isEscKey} from './utils.js';
+import {createSlider, selectionFilter} from './photo-filter.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
@@ -40,6 +41,9 @@ onUploadFileChange.addEventListener('change', () => {
   document.body.classList.add('modal-open');
 
   document.addEventListener('keydown', onDocumentKeydown);
+
+  createSlider();
+  selectionFilter();
 });
 
 onImgUploadCancelClick.addEventListener('click', () => {
@@ -55,7 +59,7 @@ const pristine = new Pristine(onFormSubmit, {
 
 const isQuantityHashtagsValid = (hashtags) => hashtags.length < MAX_HASHTAGS_QUANTITY;
 
-const isPatternMatchingValid = (hashtags) => {
+const isHashtagsPatternValid = (hashtags) => {
   for (const hashtag of hashtags) {
     if (!TAG_PATTERN.test(hashtag)) {
       return false;
@@ -65,20 +69,16 @@ const isPatternMatchingValid = (hashtags) => {
   return true;
 };
 
-const isUniquenessHashtagsValid = (hashtags) => {
+const isHashtagsUnique = (hashtags) => {
   const uniqueHashtags = new Set(hashtags);
 
-  if (!(hashtags.length === uniqueHashtags.size)) {
-    return false;
-  }
-
-  return true;
+  return hashtags.length === uniqueHashtags.size;
 };
 
 const isHashtagsValid = () => {
   const hashtags = userHashtags.value.toLowerCase().split(' ');
 
-  return isQuantityHashtagsValid(hashtags) && isPatternMatchingValid(hashtags) && isUniquenessHashtagsValid(hashtags);
+  return isQuantityHashtagsValid(hashtags) && isHashtagsPatternValid(hashtags) && isHashtagsUnique(hashtags);
 };
 
 const isDescriptionValid = () => description.value.length < MAX_TEXT_LENGTH;
