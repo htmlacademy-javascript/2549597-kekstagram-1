@@ -1,5 +1,6 @@
 import {isEscKey} from './utils.js';
-import {createSlider, selectionFilter} from './photo-filter.js';
+import {selectFilter, setDefaultScalePhoto} from './photo-filters.js';
+import {resetSlider} from './slider.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
@@ -16,6 +17,7 @@ const description = document.querySelector('.text__description');
 
 const closeForm = () => {
   onFormSubmit.reset();
+  resetSlider();
 
   document.body.classList.remove('modal-open');
   imgUploadOverlay.classList.add('hidden');
@@ -42,8 +44,8 @@ onUploadFileChange.addEventListener('change', () => {
 
   document.addEventListener('keydown', onDocumentKeydown);
 
-  createSlider();
-  selectionFilter();
+  setDefaultScalePhoto();
+  selectFilter();
 });
 
 onImgUploadCancelClick.addEventListener('click', () => {
@@ -69,14 +71,14 @@ const isHashtagsPatternValid = (hashtags) => {
   return true;
 };
 
-const isHashtagsUnique = (hashtags) => {
-  const uniqueHashtags = new Set(hashtags);
-
-  return hashtags.length === uniqueHashtags.size;
-};
+const isHashtagsUnique = (hashtags) => hashtags.length === new Set(hashtags).size;
 
 const isHashtagsValid = () => {
   const hashtags = userHashtags.value.toLowerCase().split(' ');
+
+  if (hashtags.length === 0) {
+    return true;
+  }
 
   return isQuantityHashtagsValid(hashtags) && isHashtagsPatternValid(hashtags) && isHashtagsUnique(hashtags);
 };
