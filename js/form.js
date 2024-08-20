@@ -1,6 +1,6 @@
 import {isEscKey} from './utils.js';
-import {selectFilter, setDefaultScalePhoto} from './photo-filters.js';
-import {resetSlider} from './slider.js';
+import {resetScale} from './photo-filters.js';
+import {resetSlider} from './photo-filters.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
@@ -44,8 +44,7 @@ onUploadFileChange.addEventListener('change', () => {
 
   document.addEventListener('keydown', onDocumentKeydown);
 
-  setDefaultScalePhoto();
-  selectFilter();
+  resetScale();
 });
 
 onImgUploadCancelClick.addEventListener('click', () => {
@@ -76,7 +75,7 @@ const isHashtagsUnique = (hashtags) => hashtags.length === new Set(hashtags).siz
 const isHashtagsValid = () => {
   const hashtags = userHashtags.value.toLowerCase().split(' ');
 
-  if (hashtags.length === 0) {
+  if (hashtags.length) {
     return true;
   }
 

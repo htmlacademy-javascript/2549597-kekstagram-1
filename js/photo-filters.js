@@ -1,15 +1,51 @@
-import {extractScaleValue} from './utils.js';
+import {convertToNumber} from './utils.js';
 
 const SCALE_STEP = 25;
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
-const SLIDER_PARAMETERS = {
-  'none': [[0, 1, 0.1], 'none'],
-  'chrome': [[0, 1, 0.1], 'grayscale'],
-  'sepia': [[0, 1, 0.1], 'sepia'],
-  'marvin': [[0, 100, 1], 'invert'],
-  'phobos': [[0, 3, 0.1], 'blur'],
-  'heat': [[1, 3, 0.1], 'brightness'],
+const FILTERS = {
+  'none': {
+    min: 0,
+    max: 1,
+    step: 0.1,
+    filter: 'none',
+    postfix: '',
+  },
+  'chrome': {
+    min: 0,
+    max: 1,
+    step: 0.1,
+    filter: 'grayscale',
+    postfix: '',
+  },
+  'sepia': {
+    min: 0,
+    max: 1,
+    step: 0.1,
+    filter: 'sepia',
+    postfix: '',
+  },
+  'marvin': {
+    min: 0,
+    max: 100,
+    step: 1,
+    filter: 'invert',
+    postfix: '%',
+  },
+  'phobos': {
+    min: 0,
+    max: 3,
+    step: 0.1,
+    filter: 'blur',
+    postfix: 'px',
+  },
+  'heat': {
+    min: 1,
+    max: 3,
+    step: 0.1,
+    filter: 'brightness',
+    postfix: '',
+  },
 };
 
 export const sliderElement = document.querySelector('.effect-level__slider');
@@ -20,92 +56,116 @@ const scale = document.querySelector('.scale__control--value');
 const imgUploadPreview = document.querySelector('.img-upload__preview');
 const filters = document.querySelector('.effects__list');
 const sliderContainer = document.querySelector('.img-upload__effect-level');
+
 let scaleValue = MAX_SCALE_VALUE;
 let currentFilter = '';
+let filterData = {};
+
+noUiSlider.create(sliderElement, {
+  range: {
+    min: 0,
+    max: 100,
+  },
+  start: 100,
+  connect: 'lower',
+  step: 1,
+  format: {
+    to: function (value) {
+      return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  },
+});
+
+sliderElement.noUiSlider.on('update', () => {
+  valueElement.value = sliderElement.noUiSlider.get();
+
+  imgUploadPreview.style.filter = `${filterData.filter}(${sliderElement.noUiSlider.get() + filterData.postfix})`;
+});
+
+export const resetSlider = () => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: 0,
+      max: 100,
+    },
+    start: 100,
+    step: 1,
+  });
+
+  imgUploadPreview.style.filter = 'none';
+
+  sliderContainer.classList.add('hidden');
+};
 
 const removeFilter = () => {
   imgUploadPreview.classList.remove(`effects__preview--${currentFilter}`);
 };
 
-const settingSliderParameters = (parametersFilter, filterName) => {
-  let postfix = '';
-
+const settingSliderParameters = (parametersFilter) => {
   sliderElement.noUiSlider.updateOptions({
     range: {
-      min: parametersFilter[0],
-      max: parametersFilter[1],
+      min: parametersFilter.min,
+      max: parametersFilter.max,
     },
-    start: parametersFilter[1],
-    step: parametersFilter[2],
-  });
-
-  if (filterName === 'invert') {
-    postfix = '%';
-  }
-
-  if (filterName === 'blur') {
-    postfix = 'px';
-  }
-
-  sliderElement.noUiSlider.on('update', () => {
-    valueElement.value = sliderElement.noUiSlider.get();
-
-    imgUploadPreview.style.filter = `${filterName}(${sliderElement.noUiSlider.get() + postfix})`;
-
-    if (filterName === 'none') {
-      imgUploadPreview.style.filter = `${filterName}`;
-    }
+    start: parametersFilter.max,
+    step: parametersFilter.step,
   });
 };
 
-const setFilter = (effectValue) => {
+const setFilter = (effectValue, filterName) => {
   removeFilter();
-
-  const filterName = effectValue[0];
-  const filterParameters = effectValue[1][0];
-  const filter = effectValue[1][1];
 
   imgUploadPreview.classList.add(`effects__preview--${filterName}`);
 
-  settingSliderParameters(filterParameters, filter);
+  settingSliderParameters(effectValue);
 
-  sliderContainer.classList.toggle('hidden', filterName === 'none');
+  sliderContainer.classList.remove('hidden');
 
   currentFilter = filterName;
 };
 
-export const selectFilter = () => {
-  filters.addEventListener('click', (evt) => {
-    const closestEl = evt.target.closest('.effects__radio[id]');
+filters.addEventListener('click', (evt) => {
+  const closestEl = evt.target.closest('.effects__radio[id]');
 
-    if (!closestEl) {
-      return;
-    }
+  if (!closestEl) {
+    return;
+  }
 
-    const filterData = Object.entries(SLIDER_PARAMETERS).find((item) => item[0] === closestEl.value);
+  filterData = FILTERS[closestEl.value];
 
-    if (filterData) {
-      setFilter(filterData);
-    }
-  });
+  if (closestEl.value === 'none') {
+    resetSlider();
+
+    return;
+  }
+
+  if (filterData) {
+    setFilter(filterData, closestEl.value);
+  }
+});
+
+const setScaleValue = (scaleSize) => {
+  scale.value = `${scaleSize}%`;
+  imgUploadPreview.style.transform = `scale(${(scaleSize) / MAX_SCALE_VALUE})`;
 };
 
-export const setDefaultScalePhoto = () => {
-  scale.value = `${MAX_SCALE_VALUE}%`;
+export const resetScale = () => {
+  setScaleValue(scaleValue);
 };
 
 const setUpScalePhoto = () => {
-  scaleValue = Math.min(MAX_SCALE_VALUE, extractScaleValue(scale.value) + SCALE_STEP);
+  scaleValue = Math.min(MAX_SCALE_VALUE, convertToNumber(scale.value) + SCALE_STEP);
 
-  scale.value = `${scaleValue}%`;
-  imgUploadPreview.style.transform = `scale(${(scaleValue) / MAX_SCALE_VALUE})`;
+  setScaleValue(scaleValue);
 };
 
 const setDownScalePhoto = () => {
-  scaleValue = Math.max(MIN_SCALE_VALUE, extractScaleValue(scale.value) - SCALE_STEP);
+  scaleValue = Math.max(MIN_SCALE_VALUE, convertToNumber(scale.value) - SCALE_STEP);
 
-  scale.value = `${scaleValue}%`;
-  imgUploadPreview.style.transform = `scale(${(scaleValue) / MAX_SCALE_VALUE})`;
+  setScaleValue(scaleValue);
 };
 
 downScalePhoto.addEventListener('click', () => {
