@@ -106,6 +106,7 @@ const setFilter = () => {
 
   if (activeFilter === FILTERS.none) {
     sliderContainer.classList.add('hidden');
+    imgUploadPreview.removeAttribute('style');
   } else {
     sliderContainer.classList.remove('hidden');
   }
@@ -115,7 +116,6 @@ export const resetSlider = () => {
   activeFilter = FILTERS.none;
 
   setFilter();
-  imgUploadPreview.removeAttribute('style');
 };
 
 filters.addEventListener('change', (evt) => {
@@ -127,11 +127,7 @@ filters.addEventListener('change', (evt) => {
 
   activeFilter = FILTERS[effectEl.value] ?? FILTERS.none;
 
-  if (activeFilter.name === 'none') {
-    resetSlider();
-  } else {
-    setFilter();
-  }
+  setFilter();
 });
 
 const setScaleValue = (scaleSize) => {
