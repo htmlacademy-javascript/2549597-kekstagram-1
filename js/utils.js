@@ -11,3 +11,4 @@ export const getRandomArrayElement = (elements) => elements[getRandomValue(0, el
 
 export const isEscKey = (evt) => evt.key === 'Escape';
 
+export const convertToNumber = (value) => parseInt(value, 10);
