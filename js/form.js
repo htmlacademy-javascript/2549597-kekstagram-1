@@ -1,6 +1,5 @@
 import {isEscKey} from './utils.js';
-import {resetScale} from './photo-filters.js';
-import {resetSlider} from './photo-filters.js';
+import {resetScale, resetSlider} from './photo-filters.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;

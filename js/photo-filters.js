@@ -9,6 +9,7 @@ const FILTERS = {
     max: 1,
     step: 0.1,
     filter: 'none',
+    name: 'none',
     postfix: '',
   },
   'chrome': {
@@ -16,6 +17,7 @@ const FILTERS = {
     max: 1,
     step: 0.1,
     filter: 'grayscale',
+    name: 'chrome',
     postfix: '',
   },
   'sepia': {
@@ -23,6 +25,7 @@ const FILTERS = {
     max: 1,
     step: 0.1,
     filter: 'sepia',
+    name: 'sepia',
     postfix: '',
   },
   'marvin': {
@@ -30,6 +33,7 @@ const FILTERS = {
     max: 100,
     step: 1,
     filter: 'invert',
+    name: 'marvin',
     postfix: '%',
   },
   'phobos': {
@@ -37,6 +41,7 @@ const FILTERS = {
     max: 3,
     step: 0.1,
     filter: 'blur',
+    name: 'phobos',
     postfix: 'px',
   },
   'heat': {
@@ -44,22 +49,21 @@ const FILTERS = {
     max: 3,
     step: 0.1,
     filter: 'brightness',
+    name: 'heat',
     postfix: '',
   },
 };
 
-export const sliderElement = document.querySelector('.effect-level__slider');
+const sliderElement = document.querySelector('.effect-level__slider');
 const valueElement = document.querySelector('.effect-level__value');
-const downScalePhoto = document.querySelector('.scale__control--smaller');
-const upScalePhoto = document.querySelector('.scale__control--bigger');
+const onScaleDownClick = document.querySelector('.scale__control--smaller');
+const onScaleUpClick = document.querySelector('.scale__control--bigger');
 const scale = document.querySelector('.scale__control--value');
 const imgUploadPreview = document.querySelector('.img-upload__preview');
 const filters = document.querySelector('.effects__list');
 const sliderContainer = document.querySelector('.img-upload__effect-level');
 
-let scaleValue = MAX_SCALE_VALUE;
-let currentFilter = '';
-let filterData = {};
+let activeFilter = FILTERS.none ;
 
 noUiSlider.create(sliderElement, {
   range: {
@@ -82,68 +86,51 @@ noUiSlider.create(sliderElement, {
 sliderElement.noUiSlider.on('update', () => {
   valueElement.value = sliderElement.noUiSlider.get();
 
-  imgUploadPreview.style.filter = `${filterData.filter}(${sliderElement.noUiSlider.get() + filterData.postfix})`;
+  imgUploadPreview.style.filter = `${activeFilter.filter}(${sliderElement.noUiSlider.get() + activeFilter.postfix})`;
 });
 
+const updateSlider = () => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: activeFilter.min,
+      max: activeFilter.max,
+    },
+    start: activeFilter.max,
+    step: activeFilter.step,
+  });
+};
+
+const setFilter = () => {
+  imgUploadPreview.className = `effects__preview--${activeFilter.name}`;
+  updateSlider();
+
+  if (activeFilter === FILTERS.none) {
+    sliderContainer.classList.add('hidden');
+  } else {
+    sliderContainer.classList.remove('hidden');
+  }
+};
+
 export const resetSlider = () => {
-  sliderElement.noUiSlider.updateOptions({
-    range: {
-      min: 0,
-      max: 100,
-    },
-    start: 100,
-    step: 1,
-  });
+  activeFilter = FILTERS.none;
 
-  imgUploadPreview.style.filter = 'none';
-
-  sliderContainer.classList.add('hidden');
+  setFilter();
+  imgUploadPreview.removeAttribute('style');
 };
 
-const removeFilter = () => {
-  imgUploadPreview.classList.remove(`effects__preview--${currentFilter}`);
-};
+filters.addEventListener('change', (evt) => {
+  const effectEl = evt.target.closest('.effects__radio[id]');
 
-const settingSliderParameters = (parametersFilter) => {
-  sliderElement.noUiSlider.updateOptions({
-    range: {
-      min: parametersFilter.min,
-      max: parametersFilter.max,
-    },
-    start: parametersFilter.max,
-    step: parametersFilter.step,
-  });
-};
-
-const setFilter = (effectValue, filterName) => {
-  removeFilter();
-
-  imgUploadPreview.classList.add(`effects__preview--${filterName}`);
-
-  settingSliderParameters(effectValue);
-
-  sliderContainer.classList.remove('hidden');
-
-  currentFilter = filterName;
-};
-
-filters.addEventListener('click', (evt) => {
-  const closestEl = evt.target.closest('.effects__radio[id]');
-
-  if (!closestEl) {
+  if (!effectEl) {
     return;
   }
 
-  filterData = FILTERS[closestEl.value];
+  activeFilter = FILTERS[effectEl.value] ?? FILTERS.none;
 
-  if (closestEl.value === 'none') {
+  if (activeFilter.name === 'none') {
     resetSlider();
-
-    return;
-  }
-
-  if (filterData) {
-    setFilter(filterData, closestEl.value);
+  } else {
+    setFilter();
   }
 });
 
@@ -153,25 +140,17 @@ const setScaleValue = (scaleSize) => {
 };
 
 export const resetScale = () => {
-  setScaleValue(scaleValue);
+  setScaleValue(MAX_SCALE_VALUE);
 };
 
-const setUpScalePhoto = () => {
-  scaleValue = Math.min(MAX_SCALE_VALUE, convertToNumber(scale.value) + SCALE_STEP);
+onScaleDownClick.addEventListener('click', () => {
+  const scaleValue = Math.max(MIN_SCALE_VALUE, convertToNumber(scale.value) - SCALE_STEP);
 
   setScaleValue(scaleValue);
-};
-
-const setDownScalePhoto = () => {
-  scaleValue = Math.max(MIN_SCALE_VALUE, convertToNumber(scale.value) - SCALE_STEP);
-
-  setScaleValue(scaleValue);
-};
-
-downScalePhoto.addEventListener('click', () => {
-  setDownScalePhoto();
 });
 
-upScalePhoto.addEventListener('click', () => {
-  setUpScalePhoto();
+onScaleUpClick.addEventListener('click', () => {
+  const scaleValue = Math.min(MAX_SCALE_VALUE, convertToNumber(scale.value) + SCALE_STEP);
+
+  setScaleValue(scaleValue);
 });
