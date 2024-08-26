@@ -1,11 +1,17 @@
-import {isEscKey} from './utils.js';
+import {isEscKey, showAlert} from './utils.js';
 import {resetScale, resetSlider} from './photo-filters.js';
+import {sendData} from './api.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
 const TAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
 const HASHTAG_ERROR_TEXT = 'Не верный хештэг';
 const TEXTAREA_ERROR_TEXT = `Длина комментария не больше ${MAX_TEXT_LENGTH} символов`;
+const SUBMIT_BUTTON_TEXT = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...'
+};
+const SUCCESS_MESSAGE = 'Данные успешно отправлены';
 
 const onUploadFileChange = document.querySelector('.img-upload__input');
 const imgUploadOverlay = document.querySelector('.img-upload__overlay');
@@ -13,8 +19,9 @@ const onImgUploadCancelClick = document.querySelector('.img-upload__cancel');
 const onFormSubmit = document.querySelector('.img-upload__form');
 const userHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
+const submitBtn = document.querySelector('.img-upload__submit');
 
-const closeForm = () => {
+export const closeForm = () => {
   onFormSubmit.reset();
   resetSlider();
 
@@ -74,7 +81,7 @@ const isHashtagsUnique = (hashtags) => hashtags.length === new Set(hashtags).siz
 const isHashtagsValid = () => {
   const hashtags = userHashtags.value.toLowerCase().split(' ');
 
-  if (hashtags.length) {
+  if (!hashtags.length) {
     return true;
   }
 
@@ -86,10 +93,32 @@ const isDescriptionValid = () => description.value.length < MAX_TEXT_LENGTH;
 pristine.addValidator(userHashtags, isHashtagsValid, HASHTAG_ERROR_TEXT);
 pristine.addValidator(description, isDescriptionValid, TEXTAREA_ERROR_TEXT);
 
-onFormSubmit.addEventListener('submit', (evt) => {
-  const isValid = pristine.validate();
+const lockSubmitBtn = () => {
+  submitBtn.disabled = 'true';
+  submitBtn.textContent = SUBMIT_BUTTON_TEXT.SENDING;
+};
 
-  if (!isValid) {
+const unlockSubmitBtn = () => {
+  submitBtn.removeAttribute('disabled');
+  submitBtn.textContent = SUBMIT_BUTTON_TEXT.IDLE;
+};
+
+export const setUserFormSubmit = (onSuccess) => {
+  onFormSubmit.addEventListener('submit', (evt) => {
     evt.preventDefault();
-  }
-});
+
+    const isValid = pristine.validate();
+    if (isValid) {
+      lockSubmitBtn();
+      sendData(new FormData(evt.target))
+        .then(onSuccess)
+        .catch((err) => {
+          showAlert(err.message);
+        })
+        .finally(() => {
+          showAlert(SUCCESS_MESSAGE, true);
+          unlockSubmitBtn();
+        });
+    }
+  });
+};
