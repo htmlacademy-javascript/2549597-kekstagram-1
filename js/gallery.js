@@ -1,6 +1,5 @@
 import {showBigPhoto} from './big-picture.js';
-import {getData} from './api.js';
-import {showAlert} from './utils.js';
+import {showAlert} from './dialogs.js';
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
@@ -28,15 +27,16 @@ export const renderGallery = (data) => {
   pictures.append(fragment);
 };
 
-getData()
-  .then((photoData) => {
+export const initGallery = (data) => {
+  data.then((photoData) => {
     renderGallery(photoData);
     photos = photoData;
   }).catch(
-    (err) => {
-      showAlert(err.message);
+    () => {
+      showAlert();
     }
   );
+};
 
 pictures.addEventListener('click', (evt) => {
   const closestEl = evt.target.closest('.picture__img[data-id]');

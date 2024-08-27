@@ -1212,6 +1212,18 @@ main {
 
   background-color: rgba(0, 0, 0, 0.8);
 }
+.error_load {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  bottom: 0;
+  z-index: 10;
+  background-color: rgba(147, 33, 33, 0.8);
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4%;
+}
 
 .error__inner,
 .success__inner {
