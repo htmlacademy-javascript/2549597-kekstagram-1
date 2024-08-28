@@ -1,7 +1,7 @@
 import {isEscKey} from './utils.js';
 import {resetScale, resetSlider} from './photo-filters.js';
 import {sendData} from './api.js';
-import {showDialog, errorTemplate, successTemplate} from './dialogs.js';
+import {showDialog} from './dialogs.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
@@ -20,6 +20,8 @@ const onFormSubmit = document.querySelector('.img-upload__form');
 const userHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
 const submitBtn = document.querySelector('.img-upload__submit');
+const errorFeedback = document.querySelector('#error').content.querySelector('.error');
+const successFeedback = document.querySelector('#success').content.querySelector('.success');
 
 export const closeForm = () => {
   onFormSubmit.reset();
@@ -108,10 +110,10 @@ onFormSubmit.addEventListener('submit', (evt) => {
     sendData(new FormData(evt.target))
       .then(() => {
         closeForm();
-        showDialog(successTemplate);
+        showDialog(successFeedback);
       })
       .catch(() => {
-        showDialog(errorTemplate);
+        showDialog(errorFeedback);
       })
       .finally(() => {
         toggleSubmitBtn(false);
