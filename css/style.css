@@ -1212,7 +1212,8 @@ main {
 
   background-color: rgba(0, 0, 0, 0.8);
 }
-.error_load {
+
+.error__load {
   position: absolute;
   display: flex;
   justify-content: center;

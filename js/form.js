@@ -1,7 +1,7 @@
 import {isEscKey} from './utils.js';
 import {resetScale, resetSlider} from './photo-filters.js';
 import {sendData} from './api.js';
-import {showDialog, isErrorFieldEnable} from './dialogs.js';
+import {showDialog, errorTemplate, successTemplate} from './dialogs.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
@@ -34,10 +34,6 @@ export const closeForm = () => {
 const isTextFieldFocused = () => document.activeElement === userHashtags || document.activeElement === description;
 
 function onDocumentKeydown(evt) {
-  if(isErrorFieldEnable()) {
-    return;
-  }
-
   if (isTextFieldFocused()) {
     return;
   }
@@ -98,13 +94,8 @@ pristine.addValidator(userHashtags, isHashtagsValid, HASHTAG_ERROR_TEXT);
 pristine.addValidator(description, isDescriptionValid, TEXTAREA_ERROR_TEXT);
 
 const toggleSubmitBtn = (disable) => {
-  if (disable) {
-    submitBtn.disable = 'true';
-    submitBtn.textContent = SubmitButtonText.SENDING;
-  } else {
-    submitBtn.removeAttribute('disable');
-    submitBtn.textContent = SubmitButtonText.IDLE;
-  }
+  submitBtn.disabled = disable;
+  submitBtn.textContent = disable ? SubmitButtonText.SENDING : SubmitButtonText.IDLE;
 };
 
 onFormSubmit.addEventListener('submit', (evt) => {
@@ -117,10 +108,10 @@ onFormSubmit.addEventListener('submit', (evt) => {
     sendData(new FormData(evt.target))
       .then(() => {
         closeForm();
-        showDialog(true);
+        showDialog(successTemplate);
       })
       .catch(() => {
-        showDialog(false);
+        showDialog(errorTemplate);
       })
       .finally(() => {
         toggleSubmitBtn(false);
