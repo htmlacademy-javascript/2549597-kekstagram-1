@@ -1,6 +1,16 @@
 import './gallery.js';
-import './functions.js';
 import './big-picture.js';
 import './form.js';
-import './photo-filters.js';
 
+import {getData} from './api.js';
+import {initGallery} from './gallery.js';
+import {showAlert} from './dialogs.js';
+
+getData()
+  .then((photoData) => {
+    initGallery(photoData);
+  }).catch(
+    () => {
+      showAlert();
+    }
+  );

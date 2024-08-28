@@ -83,7 +83,7 @@ onCloseBtnClick.addEventListener('click', () => {
 });
 
 export const showBigPhoto = (photo) => {
-  comments = photo.comment;
+  comments = photo.comments;
 
   bigPicture.classList.remove('hidden');
   document.addEventListener('keydown', onDocumentKeydown);

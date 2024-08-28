@@ -1,11 +1,17 @@
 import {isEscKey} from './utils.js';
 import {resetScale, resetSlider} from './photo-filters.js';
+import {sendData} from './api.js';
+import {showDialog} from './dialogs.js';
 
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
 const TAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
 const HASHTAG_ERROR_TEXT = 'Не верный хештэг';
 const TEXTAREA_ERROR_TEXT = `Длина комментария не больше ${MAX_TEXT_LENGTH} символов`;
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...'
+};
 
 const onUploadFileChange = document.querySelector('.img-upload__input');
 const imgUploadOverlay = document.querySelector('.img-upload__overlay');
@@ -13,8 +19,11 @@ const onImgUploadCancelClick = document.querySelector('.img-upload__cancel');
 const onFormSubmit = document.querySelector('.img-upload__form');
 const userHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
+const submitBtn = document.querySelector('.img-upload__submit');
+const errorFeedback = document.querySelector('#error').content.querySelector('.error');
+const successFeedback = document.querySelector('#success').content.querySelector('.success');
 
-const closeForm = () => {
+export const closeForm = () => {
   onFormSubmit.reset();
   resetSlider();
 
@@ -74,7 +83,7 @@ const isHashtagsUnique = (hashtags) => hashtags.length === new Set(hashtags).siz
 const isHashtagsValid = () => {
   const hashtags = userHashtags.value.toLowerCase().split(' ');
 
-  if (hashtags.length) {
+  if (!hashtags.length) {
     return true;
   }
 
@@ -86,10 +95,29 @@ const isDescriptionValid = () => description.value.length < MAX_TEXT_LENGTH;
 pristine.addValidator(userHashtags, isHashtagsValid, HASHTAG_ERROR_TEXT);
 pristine.addValidator(description, isDescriptionValid, TEXTAREA_ERROR_TEXT);
 
+const toggleSubmitBtn = (disable) => {
+  submitBtn.disabled = disable;
+  submitBtn.textContent = disable ? SubmitButtonText.SENDING : SubmitButtonText.IDLE;
+};
+
 onFormSubmit.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
   const isValid = pristine.validate();
 
-  if (!isValid) {
-    evt.preventDefault();
+  if (isValid) {
+    toggleSubmitBtn(true);
+    sendData(new FormData(evt.target))
+      .then(() => {
+        closeForm();
+        showDialog(successFeedback);
+      })
+      .catch(() => {
+        showDialog(errorFeedback);
+      })
+      .finally(() => {
+        toggleSubmitBtn(false);
+      });
   }
 });
+
