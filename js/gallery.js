@@ -1,12 +1,18 @@
 import {showBigPhoto} from './big-picture.js';
-import {filterId} from './sorting-photos.js';
-import {getRandomArrayElement} from './utils.js';
+import {debounce} from './utils.js';
 
 const QUANTITY_UNIQUE_PHOTO = 10;
+const ACTIVE_FILTER = 'img-filters__button--active';
+const FilterId = {
+  FILTER_RANDOM: 'filter-random',
+  FILTER_DISCUSSED: 'filter-discussed',
+  FILTER_DEFAULT: 'filter-default',
+};
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
 const imageFilters = document.querySelector('.img-filters');
+const imgFiltersSection = document.querySelector('.img-filters');
 
 let photos = [];
 
@@ -21,40 +27,52 @@ const createPhotoElement = (data) => {
   return image;
 };
 
-const getRandomPhotos = (data) => {
-  const mass = new Set();
-  while (mass.size < QUANTITY_UNIQUE_PHOTO) {
-    mass.add(getRandomArrayElement(data));
-  }
+const getClearScreen = () => {
+  const allPhotos = document.querySelectorAll('.picture');
 
-  return Array.from(mass).toSorted((firstElem, secondElem) => firstElem.id - secondElem.id);
+  for (const photo of allPhotos) {
+    photo.remove();
+  }
 };
 
+const getRandomPhotos = (data) => data.toSorted(() => Math.random() - 0.5).slice(0, QUANTITY_UNIQUE_PHOTO);
 
-const getDiscussedPhotos = (data) => data.toSorted((firstElEM, secondElem) => secondElem.comments.length - firstElEM.comments.length);
+const getDiscussedPhotos = (data) => data.toSorted((first, second) => second.comments.length - first.comments.length);
 
-const getNewPhotoElements = (data) => {
-  if (filterId === 'filter-random') {
-    return getRandomPhotos(data);
-  }else {
-    return getDiscussedPhotos(data);
+const getSortedPhotos = (filter, data) => {
+  switch (filter) {
+    case 'filter-random': return getRandomPhotos(data);
+    case 'filter-discussed': return getDiscussedPhotos(data);
+    case 'filter-default': return data;
   }
 };
 
 export const renderGallery = (data) => {
   const fragment = document.createDocumentFragment();
 
-  if (filterId !== 'filter-default') {
-    data = getNewPhotoElements(data);
-  }
-
   data.forEach((element) => {
     fragment.append(createPhotoElement(element));
   });
 
-  pictures.innerHTML = '';
   pictures.append(fragment);
 };
+
+const debounceData = debounce((data) => renderGallery(data));
+
+imgFiltersSection.addEventListener('click', (evt) => {
+  const filtersBtn = evt.target.closest('.img-filters__button');
+  const activeFilter = document.querySelector(`.${ACTIVE_FILTER}`);
+
+  if (!filtersBtn) {
+    return;
+  }
+
+  activeFilter?.classList.remove(ACTIVE_FILTER);
+  filtersBtn.classList.add(ACTIVE_FILTER);
+
+  getClearScreen();
+  debounceData(getSortedPhotos(filtersBtn.ыid, photos));
+});
 
 export const initGallery = (photoData) => {
   renderGallery(photoData);
