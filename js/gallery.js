@@ -6,7 +6,6 @@ const ACTIVE_FILTER = 'img-filters__button--active';
 const FilterId = {
   FILTER_RANDOM: 'filter-random',
   FILTER_DISCUSSED: 'filter-discussed',
-  FILTER_DEFAULT: 'filter-default',
 };
 
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
@@ -39,11 +38,11 @@ const getRandomPhotos = (data) => data.toSorted(() => Math.random() - 0.5).slice
 
 const getDiscussedPhotos = (data) => data.toSorted((first, second) => second.comments.length - first.comments.length);
 
-const getSortedPhotos = (filter, data) => {
+const getSortedPhotos = (filter) => {
   switch (filter) {
-    case 'filter-random': return getRandomPhotos(data);
-    case 'filter-discussed': return getDiscussedPhotos(data);
-    case 'filter-default': return data;
+    case FilterId.FILTER_RANDOM: return getRandomPhotos(photos);
+    case FilterId.FILTER_DISCUSSED: return getDiscussedPhotos(photos);
+    default: return photos;
   }
 };
 
@@ -71,7 +70,7 @@ imgFiltersSection.addEventListener('click', (evt) => {
   filtersBtn.classList.add(ACTIVE_FILTER);
 
   getClearScreen();
-  debounceData(getSortedPhotos(filtersBtn.ыid, photos));
+  debounceData(getSortedPhotos(filtersBtn.id));
 });
 
 export const initGallery = (photoData) => {
