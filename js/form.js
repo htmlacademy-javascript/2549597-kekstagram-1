@@ -24,10 +24,19 @@ const submitBtn = document.querySelector('.img-upload__submit');
 const errorFeedback = document.querySelector('#error').content.querySelector('.error');
 const successFeedback = document.querySelector('#success').content.querySelector('.success');
 const imgUploadPreview = document.querySelector('.img-upload__preview img');
+const backgroundImgFilters = document.querySelectorAll('.effects__preview');
+
+const clearImgFilters = () => {
+  backgroundImgFilters.forEach((image) => {
+    image.removeAttribute('style');
+  });
+};
 
 export const closeForm = () => {
   onFormSubmit.reset();
   resetSlider();
+
+  clearImgFilters();
 
   document.body.classList.remove('modal-open');
   imgUploadOverlay.classList.add('hidden');
@@ -48,6 +57,12 @@ function onDocumentKeydown(evt) {
   }
 }
 
+const setImgFilters = (file) => {
+  backgroundImgFilters.forEach((image) => {
+    image.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
+  });
+};
+
 const setUserPhoto = () => {
   const file = onUploadFileChange.files[0];
   const fileName = file.name.toLowerCase();
@@ -55,6 +70,8 @@ const setUserPhoto = () => {
 
   if (matches) {
     imgUploadPreview.src = URL.createObjectURL(file);
+
+    setImgFilters(file);
   }
 };
 
