@@ -56,7 +56,7 @@ function onDocumentKeydown(evt) {
   }
 }
 
-const setImgFilters = (source) => {
+const setEffectPreview = (source) => {
   effectsPreview.forEach((preview) => {
     preview.style.backgroundImage = `url(${source})`;
   });
@@ -71,7 +71,7 @@ const setUserPhoto = () => {
     const source = URL.createObjectURL(file);
     imgUploadPreview.src = source;
 
-    setImgFilters(source);
+    setEffectPreview(source);
   }
 };
 
