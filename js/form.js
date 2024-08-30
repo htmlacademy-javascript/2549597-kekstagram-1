@@ -3,6 +3,7 @@ import {resetScale, resetSlider} from './photo-filters.js';
 import {sendData} from './api.js';
 import {showDialog} from './dialogs.js';
 
+const FILE_TYPES = ['jpg', 'jpeg', 'png', 'raw'];
 const MAX_TEXT_LENGTH = 140;
 const MAX_HASHTAGS_QUANTITY = 5;
 const TAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
@@ -22,6 +23,7 @@ const description = document.querySelector('.text__description');
 const submitBtn = document.querySelector('.img-upload__submit');
 const errorFeedback = document.querySelector('#error').content.querySelector('.error');
 const successFeedback = document.querySelector('#success').content.querySelector('.success');
+const imgUploadPreview = document.querySelector('.img-upload__preview img');
 
 export const closeForm = () => {
   onFormSubmit.reset();
@@ -46,9 +48,21 @@ function onDocumentKeydown(evt) {
   }
 }
 
+const setUserPhoto = () => {
+  const file = onUploadFileChange.files[0];
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    imgUploadPreview.src = URL.createObjectURL(file);
+  }
+};
+
 onUploadFileChange.addEventListener('change', () => {
   imgUploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
+
+  setUserPhoto();
 
   document.addEventListener('keydown', onDocumentKeydown);
 

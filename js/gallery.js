@@ -2,7 +2,7 @@ import {showBigPhoto} from './big-picture.js';
 import {debounce} from './utils.js';
 
 const MAX_RANDOM_PHOTOS = 10;
-const ACTIVE_FILTER_CLASS = '.img-filters__button--active';
+const ACTIVE_FILTER_CLASS = 'img-filters__button--active';
 const FilterId = {
   FILTER_RANDOM: 'filter-random',
   FILTER_DISCUSSED: 'filter-discussed',
@@ -11,7 +11,7 @@ const FilterId = {
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
 const imageFilters = document.querySelector('.img-filters');
-const imgFiltersSection = document.querySelector('.img-filters');
+// const imgFiltersSection = document.querySelector('.img-filters');
 
 let photos = [];
 
@@ -26,7 +26,7 @@ const createPhotoElement = (data) => {
   return image;
 };
 
-const removeGallery = () => {
+const clearGallery = () => {
   const allPhotos = pictures.querySelectorAll('.picture');
 
   allPhotos.forEach((element) => {
@@ -56,20 +56,23 @@ export const renderGallery = (data) => {
   pictures.append(fragment);
 };
 
-const debounceRender = debounce(renderGallery);
+const debounceRender = debounce((data) => {
+  clearGallery();
+  renderGallery(data);
+});
 
-imgFiltersSection.addEventListener('click', (evt) => {
+imageFilters.addEventListener('click', (evt) => {
   const filterBtn = evt.target.closest('.img-filters__button');
-  const activeFilter = document.querySelector(ACTIVE_FILTER_CLASS);
+  const activeFilter = document.querySelector(`.${ACTIVE_FILTER_CLASS}`);
 
   if (!filterBtn) {
     return;
   }
 
-  activeFilter?.classList.remove(ACTIVE_FILTER_CLASS.slice(1));
-  filterBtn.classList.add(ACTIVE_FILTER_CLASS.slice(1));
+  activeFilter?.classList.remove(ACTIVE_FILTER_CLASS);
+  filterBtn.classList.add(ACTIVE_FILTER_CLASS);
 
-  removeGallery();
+  clearGallery();
   debounceRender(getSortedPhotos(filterBtn.id));
 });
 
