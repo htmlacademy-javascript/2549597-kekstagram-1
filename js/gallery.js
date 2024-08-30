@@ -11,7 +11,6 @@ const FilterId = {
 const imageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictures = document.querySelector('.pictures');
 const imageFilters = document.querySelector('.img-filters');
-// const imgFiltersSection = document.querySelector('.img-filters');
 
 let photos = [];
 
