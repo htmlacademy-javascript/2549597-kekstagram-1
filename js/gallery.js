@@ -1,8 +1,8 @@
 import {showBigPhoto} from './big-picture.js';
 import {debounce} from './utils.js';
 
-const QUANTITY_UNIQUE_PHOTO = 10;
-const ACTIVE_FILTER = 'img-filters__button--active';
+const MAX_RANDOM_PHOTOS = 10;
+const ACTIVE_FILTER_CLASS = '.img-filters__button--active';
 const FilterId = {
   FILTER_RANDOM: 'filter-random',
   FILTER_DISCUSSED: 'filter-discussed',
@@ -26,15 +26,15 @@ const createPhotoElement = (data) => {
   return image;
 };
 
-const getClearScreen = () => {
-  const allPhotos = document.querySelectorAll('.picture');
+const removeGallery = () => {
+  const allPhotos = pictures.querySelectorAll('.picture');
 
-  for (const photo of allPhotos) {
-    photo.remove();
-  }
+  allPhotos.forEach((element) => {
+    element.remove();
+  });
 };
 
-const getRandomPhotos = (data) => data.toSorted(() => Math.random() - 0.5).slice(0, QUANTITY_UNIQUE_PHOTO);
+const getRandomPhotos = (data) => data.toSorted(() => Math.random() - 0.5).slice(0, MAX_RANDOM_PHOTOS);
 
 const getDiscussedPhotos = (data) => data.toSorted((first, second) => second.comments.length - first.comments.length);
 
@@ -56,21 +56,21 @@ export const renderGallery = (data) => {
   pictures.append(fragment);
 };
 
-const debounceData = debounce((data) => renderGallery(data));
+const debounceRender = debounce(renderGallery);
 
 imgFiltersSection.addEventListener('click', (evt) => {
-  const filtersBtn = evt.target.closest('.img-filters__button');
-  const activeFilter = document.querySelector(`.${ACTIVE_FILTER}`);
+  const filterBtn = evt.target.closest('.img-filters__button');
+  const activeFilter = document.querySelector(ACTIVE_FILTER_CLASS);
 
-  if (!filtersBtn) {
+  if (!filterBtn) {
     return;
   }
 
-  activeFilter?.classList.remove(ACTIVE_FILTER);
-  filtersBtn.classList.add(ACTIVE_FILTER);
+  activeFilter?.classList.remove(ACTIVE_FILTER_CLASS.slice(1));
+  filterBtn.classList.add(ACTIVE_FILTER_CLASS.slice(1));
 
-  getClearScreen();
-  debounceData(getSortedPhotos(filtersBtn.id));
+  removeGallery();
+  debounceRender(getSortedPhotos(filterBtn.id));
 });
 
 export const initGallery = (photoData) => {
