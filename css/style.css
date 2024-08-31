@@ -26,7 +26,7 @@
           box-sizing: border-box;
 }
 
-body {
+body{
   font-family: "Open Sans", "Arial", sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -136,7 +136,8 @@ main {
   opacity: 0;
 }
 
-.img-filters__button {
+.img-filters__button,
+.pristine-error {
   padding: 5px 15px;
 
   font-family: "Open Sans", "Arial", sans-serif;

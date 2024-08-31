@@ -59,7 +59,7 @@ const valueElement = document.querySelector('.effect-level__value');
 const onScaleDownClick = document.querySelector('.scale__control--smaller');
 const onScaleUpClick = document.querySelector('.scale__control--bigger');
 const scale = document.querySelector('.scale__control--value');
-const imgUploadPreview = document.querySelector('.img-upload__preview');
+const imgUploadPreview = document.querySelector('.img-upload__preview img');
 const filters = document.querySelector('.effects__list');
 const sliderContainer = document.querySelector('.img-upload__effect-level');
 

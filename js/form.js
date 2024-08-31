@@ -93,11 +93,11 @@ onImgUploadCancelClick.addEventListener('click', () => {
 const pristine = new Pristine(onFormSubmit, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
-  errorTextTag: 'span',
+  errorTextTag: 'p',
   errorTextClass: 'form__error',
 });
 
-const isQuantityHashtagsValid = (hashtags) => hashtags.length < MAX_HASHTAGS_QUANTITY;
+const isQuantityHashtagsValid = (hashtags) => hashtags.length <= MAX_HASHTAGS_QUANTITY;
 
 const isHashtagsPatternValid = (hashtags) => {
   for (const hashtag of hashtags) {
@@ -112,7 +112,11 @@ const isHashtagsPatternValid = (hashtags) => {
 const isHashtagsUnique = (hashtags) => hashtags.length === new Set(hashtags).size;
 
 const isHashtagsValid = () => {
-  const hashtags = userHashtags.value.toLowerCase().split(' ');
+  const hashtags = userHashtags.value
+    .toLowerCase()
+    .trim()
+    .split(' ')
+    .filter((elem) => elem.trim());
 
   if (!hashtags.length) {
     return true;
